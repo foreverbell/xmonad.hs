@@ -17,7 +17,7 @@ import           XMonad.Layout.ResizableTile
 import           XMonad.Layout.ShowWName
 import           XMonad.Prompt
 import           XMonad.Prompt.Input
-import qualified XMonad.StackSet as StackSet 
+import qualified XMonad.StackSet as StackSet
 import           XMonad.Util.EZConfig
 import           XMonad.Util.Run
 
@@ -80,7 +80,7 @@ myMouses XConfig {XMonad.modMask = modM} = M.fromList
   , ((modM, button3), \w -> focus w >> Flex.mouseWindow Flex.resize w)
   ]
 
-myKeys SysConfig {..} = \conf -> mkKeymap conf $ 
+myKeys SysConfig {..} = \conf -> mkKeymap conf $
   [ ("M-" ++ show i, windows $ StackSet.greedyView (mkWorkspaceName i)) | i <- [1 .. 9] ] ++
   [ ("M-S-" ++ show i, do
       windows $ StackSet.shift (mkWorkspaceName i)
@@ -114,7 +114,6 @@ myKeys SysConfig {..} = \conf -> mkKeymap conf $
       , ("web-browser", sysBrowser)
       , ("firefox", "firefox")
       , ("explorer", "thunar")
-      , ("system", "gnome-system-monitor")
       , ("gedit", "gedit")
       , ("okular", "okular")
       , ("eclipse", "eclipse-ide")
@@ -137,7 +136,7 @@ myKeys SysConfig {..} = \conf -> mkKeymap conf $
   , ("M-S-<F5>", setBacklight (+ (-10)))
   , ("M-S-<F6>", setBacklight (+ 10))
   ] ++ searchKeys sysBrowser
-  where 
+  where
     runInTerminal cmd = sysTerminal ++ " -e " ++ cmd
     clamp x | x < 0 = 0
             | x > 100 = 100
@@ -163,7 +162,8 @@ myManageHook = composeAll
     moveTo i = let ws = mkWorkspaceName i in doF $ StackSet.greedyView ws . StackSet.shift ws
     doDialogFloat = doFloatDep move
       where
-        -- We need to resize our floating window a bit larger, since XMonad's way of handling floating window is a bit .. problematic.
+        -- We need to resize our floating window a bit larger, since XMonad's way of handling
+        -- floating window is a bit .. problematic.
         move (StackSet.RationalRect _ _ w h) = StackSet.RationalRect ((1-w')/2) ((1-h')/2) w' h'
           where
             w' = min 1 (w+d)
@@ -171,14 +171,14 @@ myManageHook = composeAll
             d = 0.05
 
 myLayout = avoidStruts $ minimize $ smartBorders composed
-  where 
+  where
     tiled = ResizableTall 1 0.03 0.5 []
     full = Full
     composed = full ||| tiled
 
 -- TODO: Consider XMonad.Prompt.insertString
 myPromptKeymap = M.union defaultXPKeymap $ M.fromList
-  [ ((controlMask, xK_v), setInput =<< liftIO getClipboard) 
+  [ ((controlMask, xK_v), setInput =<< liftIO getClipboard)
   ]
 
 myXPConfig = amberXPConfig
@@ -190,11 +190,11 @@ myXPConfig = amberXPConfig
 
 searchKeys browser = [ ("M-/ " ++ name, promptSearch e) | e@(S.SearchEngine name _, _) <- engines ]
   where
-    promptSearch (S.SearchEngine _ site, abbr) = inputPrompt myXPConfig ("Search [" ++ abbr ++ "]")  ?+ \query -> S.search browser site query
+    promptSearch (S.SearchEngine _ site, abbr) = inputPrompt myXPConfig ("Search [" ++ abbr ++ "]") ?+ \query -> S.search browser site query
     engines = mk <$> [ ("h", "hoogle", "http://www.haskell.org/hoogle/?hoogle=")
                      , ("g", "google", "https://www.google.com.hk/search?num=100&q=")
                      , ("w", "wikipedia", "https://en.wikipedia.org/wiki/Special:Search?go=Go&search=")
-                     , ("s", "scholar", "https://scholar.google.de/scholar?q=")
+                     , ("s", "scholar", "https://scholar.google.com/scholar?q=")
                      , ("d", "dict", "http://dict.youdao.com/search?q=")
                      ]
     mk (n, a, s) = (S.searchEngine n s, a)
@@ -207,7 +207,7 @@ lookupAvailableCmd cs = do
 mySysConfig :: IO SysConfig
 mySysConfig = do
   sysBrowser <- lookupAvailableCmd ["chromium-browser", "google-chrome", "firefox"]
-  sysTerminal <- lookupAvailableCmd ["xfce4-terminal", "alacritty"]
+  sysTerminal <- lookupAvailableCmd ["xfce4-terminal", "alacritty", "uxterm", "gnome-terminal"]
   sysBacklight <- do
     output <- runProcessWithInput "xbacklight" ["-get"] ""
     newIORef $ floor (read output :: Double)
@@ -231,7 +231,7 @@ main = do
     , mouseBindings = myMouses
     , manageHook = myManageHook <+> manageHook xconf
     , layoutHook = showWName myLayout
-    , startupHook = setWMName "LG3D" 
+    , startupHook = setWMName "LG3D"
     , normalBorderColor  = "#dbdbdb"
     , focusedBorderColor = "#3939ff"
     , handleEventHook = fullscreenEventHook
