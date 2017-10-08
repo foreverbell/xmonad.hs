@@ -100,8 +100,8 @@ myKeys SysConfig {..} = \conf -> mkKeymap conf $
   , ("M-q", spawnNamedSelected def { gs_font = myFont 11, gs_cellwidth = 170, gs_cellheight = 50 }
       [ ("[session] logout", "xfce4-session-logout")
       , ("[session] lock", "xflock4")
-      , ("[xmonad] recompile", "stack exec xmonad -- --recompile && stack exec xmonad -- --restart")
-      , ("[xmonad] restart", "stack exec xmonad -- --restart")
+      , ("[xmonad] recompile", "xmonad --recompile && xmonad --restart")
+      , ("[xmonad] restart", "xmonad --restart")
       ]
     )
   , ("M-p", spawn "gmrun")
@@ -207,7 +207,7 @@ lookupAvailableCmd cs = do
 mySysConfig :: IO SysConfig
 mySysConfig = do
   sysBrowser <- lookupAvailableCmd ["chromium-browser", "google-chrome", "firefox"]
-  sysTerminal <- lookupAvailableCmd ["xfce4-terminal", "alacritty", "uxterm", "gnome-terminal"]
+  sysTerminal <- lookupAvailableCmd ["alacritty", "xfce4-terminal", "gnome-terminal"]
   sysBacklight <- do
     output <- runProcessWithInput "xbacklight" ["-get"] ""
     newIORef $ floor (read output :: Double)
