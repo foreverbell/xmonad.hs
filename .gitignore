@@ -2,5 +2,7 @@ xmonad.errors
 xmonad.hi
 xmonad.o
 xmonad-x86_64-linux
+xmonad.state
 
 history
+prompt-history

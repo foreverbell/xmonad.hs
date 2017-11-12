@@ -63,7 +63,8 @@ updateBacklight backlight = do
 updateVolume :: IORef (Int, Bool) -> IO ()
 updateVolume volume = do
   (v, m) <- readIORef volume
-  spawn $ printf "amixer -q -D pulse set Master %d%% %s" v (if m then "mute" else "unmute")
+  let cmd = if m then "mute" else "unmute"
+  spawn $ printf "amixer -q -D pulse set Master %d%% %s" v cmd
 
 toggleFcitx :: IORef Bool -> IO ()
 toggleFcitx fcitx = do
@@ -97,7 +98,9 @@ myKeys SysConfig {..} = \conf -> mkKeymap conf $
       spawn "scrot -u '%Y-%m-%d:%H:%M:%S_$wx$h_window_png.png' -e 'mv $f /tmp/'"
       spawn "scrot -u '%Y-%m-%d:%H:%M:%S_$wx$h_window_jpg.jpg' -e 'mv $f /tmp/'")
   , ("M-<F11>", sendMessage ToggleStruts)
-  , ("M-q", spawnNamedSelected def { gs_font = myFont 11, gs_cellwidth = 170, gs_cellheight = 50 }
+  , ("M-q", spawnNamedSelected def { gs_font = myFont 11,
+                                     gs_cellwidth = 170,
+                                     gs_cellheight = 50 }
       [ ("[session] logout", "xfce4-session-logout")
       , ("[session] lock", "xflock4")
       , ("[xmonad] recompile", "xmonad --recompile && xmonad --restart")
@@ -112,12 +115,10 @@ myKeys SysConfig {..} = \conf -> mkKeymap conf $
   , ("M-g", spawnNamedSelected def { gs_font = myFont 11 }
       [ ("terminal", sysTerminal)
       , ("web-browser", sysBrowser)
-      , ("firefox", "firefox")
       , ("explorer", "thunar")
       , ("gedit", "gedit")
-      , ("okular", "okular")
-      , ("eclipse", "eclipse-ide")
       , ("coqide", "coqide")
+      , ("coqemacs", "emacsclient -nc -s coq -a emacs")
       ]
     )
   , ("M-<L>", prevWS)
@@ -131,10 +132,10 @@ myKeys SysConfig {..} = \conf -> mkKeymap conf $
   , ("M-m", withFocused minimizeWindow)
   , ("M-S-m", sendMessage RestoreNextMinimizedWin)
   , ("M-S-<F1>", setVolume id not)
-  , ("M-S-<F2>", setVolume (+ (-5)) id)
-  , ("M-S-<F3>", setVolume (+ 5) id)
-  , ("M-S-<F5>", setBacklight (+ (-10)))
-  , ("M-S-<F6>", setBacklight (+ 10))
+  , ("M-S-<F2>", setVolume (\x -> x - 5) id)
+  , ("M-S-<F3>", setVolume (\x -> x + 5) id)
+  , ("M-S-<F5>", setBacklight (\x -> x - 10))
+  , ("M-S-<F6>", setBacklight (\x -> x + 10))
   ] ++ searchKeys sysBrowser
   where
     runInTerminal cmd = sysTerminal ++ " -e " ++ cmd
@@ -159,16 +160,18 @@ myManageHook = composeAll
   , isDialog --> doDialogFloat
   ]
   where
-    moveTo i = let ws = mkWorkspaceName i in doF $ StackSet.greedyView ws . StackSet.shift ws
+    moveTo i = let ws = mkWorkspaceName i in
+      doF $ StackSet.greedyView ws . StackSet.shift ws
     doDialogFloat = doFloatDep move
       where
-        -- We need to resize our floating window a bit larger, since XMonad's way of handling
-        -- floating window is a bit .. problematic.
-        move (StackSet.RationalRect _ _ w h) = StackSet.RationalRect ((1-w')/2) ((1-h')/2) w' h'
-          where
-            w' = min 1 (w+d)
-            h' = min 1 (h+d)
-            d = 0.05
+        {- We need to resize our floating window a bit larger, since XMonad's
+         - way of handling floating window is a bit .. problematic.
+         -}
+        move (StackSet.RationalRect _ _ w h) =
+          let w' = min 1 (w+d)
+              h' = min 1 (h+d)
+              d = 0.05 in
+          StackSet.RationalRect ((1-w')/2) ((1-h')/2) w' h'
 
 myLayout = avoidStruts $ minimize $ smartBorders composed
   where
@@ -176,7 +179,7 @@ myLayout = avoidStruts $ minimize $ smartBorders composed
     full = Full
     composed = full ||| tiled
 
--- TODO: Consider XMonad.Prompt.insertString
+{- TODO: Consider [XMonad.Prompt.insertString] after XMonad 0.14 is released. -}
 myPromptKeymap = M.union defaultXPKeymap $ M.fromList
   [ ((controlMask, xK_v), setInput =<< liftIO getClipboard)
   ]
@@ -191,8 +194,7 @@ myXPConfig = amberXPConfig
 searchKeys browser = [ ("M-/ " ++ name, promptSearch e) | e@(S.SearchEngine name _, _) <- engines ]
   where
     promptSearch (S.SearchEngine _ site, abbr) = inputPrompt myXPConfig ("Search [" ++ abbr ++ "]") ?+ \query -> S.search browser site query
-    engines = mk <$> [ ("h", "hoogle", "http://www.haskell.org/hoogle/?hoogle=")
-                     , ("g", "google", "https://www.google.com.hk/search?num=100&q=")
+    engines = mk <$> [ ("g", "google", "https://www.google.com.hk/search?num=100&q=")
                      , ("w", "wikipedia", "https://en.wikipedia.org/wiki/Special:Search?go=Go&search=")
                      , ("s", "scholar", "https://scholar.google.com/scholar?q=")
                      , ("d", "dict", "http://dict.youdao.com/search?q=")
@@ -221,7 +223,7 @@ main = do
   updateBacklight sysBacklight
   updateVolume sysVolume
   let xconf = xfceConfig
-  xmonad $ ewmh xconf
+  xmonad $ docks $ ewmh xconf
     { terminal = sysTerminal
     , modMask = mod4Mask
     , workspaces = map mkWorkspaceName [1 .. 9]

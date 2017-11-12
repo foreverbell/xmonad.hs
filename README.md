@@ -4,7 +4,7 @@ My xmonad configuration, separated from my dotfiles.
 
 Intended to be integrated with `Xfce`.
 
-Tested with `ghc 7.10.3`.
+Tested with `xmonad 0.13` and `ghc 8.0.2`.
 
 ## TODO
 
