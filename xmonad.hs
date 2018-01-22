@@ -119,6 +119,7 @@ myKeys SysConfig {..} = \conf -> mkKeymap conf $
       , ("gedit", "gedit")
       , ("coqide", "coqide")
       , ("coqemacs", "emacsclient -nc -s coq -a emacs")
+      , ("tla-toolbox", "/opt/tla-toolbox/toolbox")
       ]
     )
   , ("M-<L>", prevWS)
@@ -153,7 +154,7 @@ myKeys SysConfig {..} = \conf -> mkKeymap conf $
 
 myManageHook :: ManageHook
 myManageHook = composeAll
-  [ (isSuffixOf "VLC media player" <$> title) --> moveTo 9
+  [ (isSuffixOf "Audacious" <$> title) --> moveTo 9
   , (isSuffixOf "Parole Media Player" <$> title) --> moveTo 9
   , title =? "xfce4-notifyd" --> doIgnore
   , isFullscreen --> doFullFloat
