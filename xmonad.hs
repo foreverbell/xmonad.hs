@@ -92,11 +92,11 @@ myKeys SysConfig {..} = \conf -> mkKeymap conf $
   , ("M-<Delete>", kill)
   , ("M1-<F4>", kill)
   , ("<Print>", do
-      spawn "scrot '%Y-%m-%d:%H:%M:%S_$wx$h_screen_png.png' -e 'mv $f /tmp/'"
-      spawn "scrot '%Y-%m-%d:%H:%M:%S_$wx$h_screen_jpg.jpg' -e 'mv $f /tmp/'")
+      spawn "scrot '%Y-%m-%d-%H-%M-%S_$wx$h_screen_png.png' -e 'mv $f /tmp/'"
+      spawn "scrot '%Y-%m-%d-%H-%M-%S_$wx$h_screen_jpg.jpg' -e 'mv $f /tmp/'")
   , ("M1-<Print>", do
-      spawn "scrot -u '%Y-%m-%d:%H:%M:%S_$wx$h_window_png.png' -e 'mv $f /tmp/'"
-      spawn "scrot -u '%Y-%m-%d:%H:%M:%S_$wx$h_window_jpg.jpg' -e 'mv $f /tmp/'")
+      spawn "scrot -u '%Y-%m-%d-%H-%M-%S_$wx$h_window_png.png' -e 'mv $f /tmp/'"
+      spawn "scrot -u '%Y-%m-%d-%H-%M-%S_$wx$h_window_jpg.jpg' -e 'mv $f /tmp/'")
   , ("M-<F11>", sendMessage ToggleStruts)
   , ("M-q", spawnNamedSelected def { gs_font = myFont 11,
                                      gs_cellwidth = 170,
@@ -137,6 +137,7 @@ myKeys SysConfig {..} = \conf -> mkKeymap conf $
   , ("M-S-<F3>", setVolume (\x -> x + 5) id)
   , ("M-S-<F5>", setBacklight (\x -> x - 10))
   , ("M-S-<F6>", setBacklight (\x -> x + 10))
+  , ("M-n", spawnBash "cd ~/n && make")  -- Rebuild notes.
   ] ++ searchKeys sysBrowser
   where
     runInTerminal cmd = sysTerminal ++ " -e " ++ cmd
