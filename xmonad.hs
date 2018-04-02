@@ -107,8 +107,8 @@ myKeys SysConfig {..} = \conf -> mkKeymap conf $
       , ("[xmonad] restart", "xmonad --restart")
       ]
     )
-  , ("M-p", spawn "gmrun")
-  , ("M-S-p", inputPrompt myXPConfig "Run [terminal]" ?+ \cmd -> spawn (runInTerminal cmd))
+  , ("M-p", spawn "xfce4-display-settings")
+  , ("M-S-p", spawn "gmrun")
   , ("M-r", spawn sysTerminal)
   , ("M-S-l", spawn "xflock4")
   , ("M-f", liftIO (toggleFcitx sysFcitx))
