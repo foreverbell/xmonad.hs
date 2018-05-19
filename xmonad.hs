@@ -92,18 +92,19 @@ myKeys SysConfig {..} = \conf -> mkKeymap conf $
   , ("M-<Delete>", kill)
   , ("M1-<F4>", kill)
   , ("<Print>", do
-      spawn "scrot '%Y-%m-%d-%H-%M-%S_$wx$h_screen_png.png' -e 'mv $f /tmp/'"
-      spawn "scrot '%Y-%m-%d-%H-%M-%S_$wx$h_screen_jpg.jpg' -e 'mv $f /tmp/'")
+      spawn "scrot '%Y-%m-%d-%H-%M-%S_$wx$h_screen.png' -e 'mv $f /tmp/'"
+      spawn "scrot '%Y-%m-%d-%H-%M-%S_$wx$h_screen.jpg' -e 'mv $f /tmp/'")
   , ("M1-<Print>", do
-      spawn "scrot -u '%Y-%m-%d-%H-%M-%S_$wx$h_window_png.png' -e 'mv $f /tmp/'"
-      spawn "scrot -u '%Y-%m-%d-%H-%M-%S_$wx$h_window_jpg.jpg' -e 'mv $f /tmp/'")
+      spawn "scrot -u '%Y-%m-%d-%H-%M-%S_$wx$h_window.png' -e 'mv $f /tmp/'"
+      spawn "scrot -u '%Y-%m-%d-%H-%M-%S_$wx$h_window.jpg' -e 'mv $f /tmp/'")
   , ("M-<F11>", sendMessage ToggleStruts)
-  , ("M-q", spawnNamedSelected def { gs_font = myFont 11,
+  , ("M-q", spawnNamedSelected def { gs_font = myFont 13,
+                                     gs_colorizer = stringColorizer,
                                      gs_cellwidth = 170,
                                      gs_cellheight = 50 }
       [ ("[session] logout", "xfce4-session-logout")
       , ("[session] lock", "xflock4")
-      , ("[xmonad] recompile", "xmonad --recompile && xmonad --restart")
+      , ("[xmonad] reload", "xmonad --recompile && xmonad --restart")
       , ("[xmonad] restart", "xmonad --restart")
       ]
     )
@@ -112,7 +113,8 @@ myKeys SysConfig {..} = \conf -> mkKeymap conf $
   , ("M-r", spawn sysTerminal)
   , ("M-S-l", spawn "xflock4")
   , ("M-f", liftIO (toggleFcitx sysFcitx))
-  , ("M-g", spawnNamedSelected def { gs_font = myFont 11 }
+  , ("M-g", spawnNamedSelected def { gs_font = myFont 13,
+                                     gs_colorizer = stringColorizer }
       [ ("terminal", sysTerminal)
       , ("web-browser", sysBrowser)
       , ("explorer", "thunar")

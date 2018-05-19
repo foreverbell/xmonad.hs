@@ -2,7 +2,7 @@
 
 My xmonad configuration, separated from my dotfiles.
 
-Intended to be integrated with `Xfce`. Note this xmonad configuration contains some settings for personal use.
+Intended to be integrated with `Xfce4`. Note this xmonad configuration contains some settings for personal use.
 
 Tested with `xmonad 0.13` and `ghc 8.0.2`.
 
