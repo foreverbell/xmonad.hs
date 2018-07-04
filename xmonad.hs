@@ -116,12 +116,8 @@ myKeys SysConfig {..} = \conf -> mkKeymap conf $
   , ("M-g", spawnNamedSelected def { gs_font = myFont 13,
                                      gs_colorizer = stringColorizer }
       [ ("terminal", sysTerminal)
-      , ("web-browser", sysBrowser)
+      , ("web", sysBrowser)
       , ("explorer", "thunar")
-      , ("gedit", "gedit")
-      , ("coqide", "coqide")
-      , ("coqemacs", "emacsclient -nc -s coq -a emacs")
-      , ("tla-toolbox", "/opt/tla-toolbox/toolbox")
       ]
     )
   , ("M-<L>", prevWS)
@@ -202,6 +198,7 @@ searchKeys browser = [ ("M-/ " ++ name, promptSearch e) | e@(S.SearchEngine name
                      , ("w", "wikipedia", "https://en.wikipedia.org/wiki/Special:Search?go=Go&search=")
                      , ("s", "scholar", "https://scholar.google.com/scholar?q=")
                      , ("d", "dict", "http://dict.youdao.com/search?q=")
+                     , ("j", "jpn", "https://jisho.org/search/")
                      ]
     mk (n, a, s) = (S.searchEngine n s, a)
 
