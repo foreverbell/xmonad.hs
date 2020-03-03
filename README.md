@@ -1,10 +1,11 @@
 # xmonad.hs
 
-My xmonad configuration, separated from my dotfiles.
+My xmonad configuration, separated from my dotfiles. Designed for `Xfce4`, with many personal settings.
 
-Intended to be integrated with `Xfce4`. Note this xmonad configuration contains some settings for personal use.
-
-Tested with `xmonad 0.13` and `ghc 8.0.2`.
+Tested with,
+* `xmonad 0.15`
+* `ghc 8.6.5`.
+* `stackage lts-14.27`.
 
 ## TODO
 

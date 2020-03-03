@@ -5,6 +5,7 @@ import           XMonad.Actions.CycleWS
 import           XMonad.Actions.CycleWindows
 import qualified XMonad.Actions.FlexibleManipulate as Flex
 import           XMonad.Actions.GridSelect
+import           XMonad.Actions.Minimize
 import qualified XMonad.Actions.Search as S
 import           XMonad.Config.Xfce
 import           XMonad.Hooks.EwmhDesktops
@@ -129,7 +130,7 @@ myKeys SysConfig {..} = \conf -> mkKeymap conf $
   , ("M-i", sendMessage Shrink)
   , ("M-o", sendMessage Expand)
   , ("M-m", withFocused minimizeWindow)
-  , ("M-S-m", sendMessage RestoreNextMinimizedWin)
+  , ("M-S-m", withLastMinimized maximizeWindowAndFocus)
   , ("M-S-<F1>", setVolume id not)
   , ("M-S-<F2>", setVolume (\x -> x - 5) id)
   , ("M-S-<F3>", setVolume (\x -> x + 5) id)
@@ -165,8 +166,7 @@ myManageHook = composeAll
     doDialogFloat = doFloatDep move
       where
         {- We need to resize our floating window a bit larger, since XMonad's
-         - way of handling floating window is a bit .. problematic.
-         -}
+         - way of handling floating window is a bit .. problematic.  -}
         move (StackSet.RationalRect _ _ w h) =
           let w' = min 1 (w+d)
               h' = min 1 (h+d)
@@ -179,9 +179,8 @@ myLayout = avoidStruts $ minimize $ smartBorders composed
     full = Full
     composed = full ||| tiled
 
-{- TODO: Consider [XMonad.Prompt.insertString] after XMonad 0.14 is released. -}
 myPromptKeymap = M.union defaultXPKeymap $ M.fromList
-  [ ((controlMask, xK_v), setInput =<< liftIO getClipboard)
+  [ ((controlMask, xK_v), insertString =<< liftIO getClipboard)
   ]
 
 myXPConfig = amberXPConfig
