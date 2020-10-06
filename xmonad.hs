@@ -40,8 +40,6 @@ spawnNamedSelected conf lst = gridselect conf lst >>= flip whenJust spawnBash
 data SysConfig = SysConfig {
   sysTerminal  :: String
 , sysBrowser   :: String
-, sysBacklight :: IORef Int
-, sysVolume    :: IORef (Int, Bool)
 , sysFcitx     :: IORef Bool
 }
 
@@ -55,17 +53,6 @@ getClipboard = runProcessWithInput "sh" ["-c", "xclip -o"] ""
 
 mkWorkspaceName :: Int -> String
 mkWorkspaceName = show
-
-updateBacklight :: IORef Int -> IO ()
-updateBacklight backlight = do
-  b <- readIORef backlight
-  spawn $ "xbacklight -time 0 -set " ++ show b
-
-updateVolume :: IORef (Int, Bool) -> IO ()
-updateVolume volume = do
-  (v, m) <- readIORef volume
-  let cmd = if m then "mute" else "unmute"
-  spawn $ printf "amixer -q -D pulse set Master %d%% %s" v cmd
 
 toggleFcitx :: IORef Bool -> IO ()
 toggleFcitx fcitx = do
@@ -131,11 +118,6 @@ myKeys SysConfig {..} = \conf -> mkKeymap conf $
   , ("M-o", sendMessage Expand)
   , ("M-m", withFocused minimizeWindow)
   , ("M-S-m", withLastMinimized maximizeWindowAndFocus)
-  , ("M-S-<F1>", setVolume id not)
-  , ("M-S-<F2>", setVolume (\x -> x - 5) id)
-  , ("M-S-<F3>", setVolume (\x -> x + 5) id)
-  , ("M-S-<F5>", setBacklight (\x -> x - 10))
-  , ("M-S-<F6>", setBacklight (\x -> x + 10))
   , ("M-n", spawnBash "cd ~/n && make")  -- Rebuild notes.
   ] ++ searchKeys sysBrowser
   where
@@ -143,14 +125,6 @@ myKeys SysConfig {..} = \conf -> mkKeymap conf $
     clamp x | x < 0 = 0
             | x > 100 = 100
             | otherwise = x
-    setVolume vol mute = liftIO $ do
-      (v, m) <- readIORef sysVolume
-      writeIORef sysVolume (clamp (vol v), mute m)
-      updateVolume sysVolume
-    setBacklight back = liftIO $ do
-      b <- readIORef sysBacklight
-      writeIORef sysBacklight (clamp (back b))
-      updateBacklight sysBacklight
 
 myManageHook :: ManageHook
 myManageHook = composeAll
@@ -210,18 +184,12 @@ mySysConfig :: IO SysConfig
 mySysConfig = do
   sysBrowser <- lookupAvailableCmd ["chromium-browser", "google-chrome", "firefox"]
   sysTerminal <- lookupAvailableCmd ["alacritty", "xfce4-terminal", "gnome-terminal"]
-  sysBacklight <- do
-    output <- runProcessWithInput "xbacklight" ["-get"] ""
-    newIORef $ floor (read output :: Double)
-  sysVolume <- newIORef (25, True)
   sysFcitx <- newIORef False
   return SysConfig { .. }
 
 main :: IO ()
 main = do
   sysconf@SysConfig {..} <- mySysConfig
-  updateBacklight sysBacklight
-  updateVolume sysVolume
   let xconf = xfceConfig
   xmonad $ docks $ ewmh xconf
     { terminal = sysTerminal
